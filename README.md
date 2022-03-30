@@ -44,7 +44,7 @@ For quick reference, here are the frequently used processors to write to a file 
 ### Step #3 - Setup Cloudera Data Engineering (CDE)
 - Go to CDE user interface, and ensure CDE service is enabled in your CDP environment & a virtual cluster is available for use.
 - Create a Spark job. In the wizard, upload enrich.py program and leave other options as default. TODO - add file.
-- Execute the job and monitor the logs to ensure it's finished successfully. It takes approx. 4 minutes to finish.
+- Execute the job and monitor logs to ensure it's finished successfully. It takes approx. 4 minutes to finish.
 - Following Hive tables are created by this job:
   - cdph.data_dictionary
   - cdph.covid_rate_by_soc_det
@@ -55,7 +55,7 @@ For quick reference, here are the frequently used processors to write to a file 
 
 ### Step #4 - Setup Cloudera Data Warehouse (CDW)
 - Go to CDW user interface. Ensure CDW service is activated in your CDP environment, and a Database Catalog & a Virtual Warehouse compute cluster is available for use.
-- Open the Hue editor and explore the Hive tables created by the CDE job.
+- Open Hue editor and explore the Hive tables created by CDE job.
   ```sql
   -- Raw Data
   select * from cdph.data_dictionary a;
@@ -85,8 +85,8 @@ For quick reference, here are the frequently used processors to write to a file 
     
     <img width="1096" alt="Dataset - COVID Demographic Rate Cumulative - Fields" src="https://user-images.githubusercontent.com/2523891/160921967-d2bb0612-47ca-4858-84c7-931e1b0bc26d.png">
    
-- Once the Datasets are available, go to the VISUALS tab and create a new dashboard.
-- Let's create first visual in the dashboard, to show **COVID-19 cases by income-groups**. Select Default Hive VW and COVID Rate by Social Determinants from the drop down menus, and create a new visual. Set the following parameters - 
+- Once Datasets are available, go to VISUALS tab and create a new dashboard.
+- Let's create first visual in the dashboard, to show **COVID-19 cases by income-groups**. Select Default Hive VW and COVID Rate by Social Determinants from drop down menus, and create a new visual. Set the following parameters - 
   - Visual Type - Combo (Combined Bar/Line)
   - Dimension - priority_sort
   - Bar Measure - avg(case_rate_per_100k)
@@ -95,7 +95,7 @@ For quick reference, here are the frequently used processors to write to a file 
   
   <img width="1434" alt="Visual 1" src="https://user-images.githubusercontent.com/2523891/160934018-1687220e-4dd7-4662-9d64-cb007dc88b8f.png">
 
-- Let's create second visual in the dashboard, to show **COVID-19 related deaths by age-groups**. Select Default Hive VW and COVID Demographic Rate Cumulative from the drop down menus, and create a new visual. Set the following parameters - 
+- Let's create second visual in the dashboard, to show **COVID-19 related deaths by age-groups**. Select Default Hive VW and COVID Demographic Rate Cumulative from drop down menus, and create a new visual. Set the following parameters - 
   - Visual Type - Lines
   - X Axis - demographic_set_category. Go to Field Properties, and select "Ascending" under "Order and Top K".
   - Y Axis - avg(metric_value_per_100k)
@@ -110,12 +110,15 @@ For quick reference, here are the frequently used processors to write to a file 
 
   <img width="1412" alt="Dashboard" src="https://user-images.githubusercontent.com/2523891/160933858-6a6db82d-883d-4631-90a6-50cfb09e81c6.png">
 
-### Step #6 - Identify Impacted Members in Hue Editor
+### Step #6 - Identify impacted members in Hue editor
+- As you can see in the visuals, **below $40K** is the most impacted income group in terms of COVID-19 cases, and **65+** is the most impacted age group in terms of COVID-19 related deaths. You can now use this information, to filter members that are in these categories.
+- Open Hue editor and execute the following queries to get impacted members:
 ```sql
 select * from member.target_mbrs_by_income a where social_tier = 'below $40K';
 select * from member.target_mbrs_by_age_group a where demographic_set_category = '65+';
 ```
 
-### Step #7 - View Cloudera Data Catalog
+### Step #7 - View Hive tables in Cloudera Data Catalog
+- Go to Data Catalog user interface. Select any Hive table created in this exercise and see its lineage, schema, audits, etc.
 
-More to come...
+---
