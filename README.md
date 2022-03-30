@@ -1,5 +1,4 @@
-# A Data Pipeline in Cloudera Data Platform (CDP)
-# WORK IN PROGRESS
+# WORK IN PROGRESS - A Data Pipeline in Cloudera Data Platform (CDP)
 ## Use Case - Accelerate COVID-19 outreach programs using Data Services in CDP
 As a healthcare provider / public health official, I want to respond equitably to the COVID-19 pandemic as quickly as possible, and serve all the communities that are adversely impacted in the state of California.  
 I want to use health equity data reported by California Department of Public Health (CDPH) to **identify impacted members** and accelerate the launch of outreach programs.
@@ -13,16 +12,17 @@ I want to use health equity data reported by California Department of Public Hea
 ## Implementation
 **Prerequisites:**  
 - A modern browser such as Google Chrome and Firefox.
-- An existing CDP environment.  
+- An existing CDP environment and knowledge of its basic functions.  
 - Add member_profile.csv to your storage bucket. TODO - add this file.
+- Add data dictionary - TODO - add this file in CSV format
 
 Steps to create this data pipeline, are as follows:  
 > Please note that this data pipeline's documentation is in accordance with CDP Runtime Version 7.2.12.
 
-**Step #1 - Setup NiFi Flow**
+### Step #1 - Setup NiFi Flow
 - Create or use a Data Hub Cluster with NiFi.  
 Following Data Hub Cluster type was used in this exercise - "7.2.12 - Flow Management Light Duty with Apache NiFi, Apache NiFi Registry".
-- Go to NiFi user interface and import NiFi-CDPH.json flow. Right click anywhere in the pane and select Upload Template to do this. TODO - add JSON file.
+- Go to NiFi user interface and import NiFi-CDPH.json flow. TODO - add JSON file.
 - NiFi-CDPH.json uses PutS3Object processor to connect to an existing Amazon S3 bucket. **Please change the properties in this processor to use your own bucket.**
 - If you don't use Amazon S3 storage, please replace PutS3Object processor with a processor of your own choice. Refer [NiFi docs](https://nifi.apache.org/docs.html) for details.  
 For quick reference, here are the frequently used processors to write to a file system - 
@@ -30,16 +30,92 @@ For quick reference, here are the frequently used processors to write to a file 
   * PutGCSObject for Google Cloud Storage
   * PutHDFS for Hadoop Distributed File System (HDFS)
 - Execute the flow and ensure InvokeHTTP processors are able to get [covid19case_rate_by_social_det.csv](https://data.chhs.ca.gov/dataset/f88f9d7f-635d-4334-9dac-4ce773afe4e5/resource/11fa525e-1c7b-4cf5-99e1-d4141ea590e4/download/covid19case_rate_by_social_det.csv) and [covid19demographicratecumulative.csv](https://data.chhs.ca.gov/dataset/f88f9d7f-635d-4334-9dac-4ce773afe4e5/resource/b500dae2-9e58-428e-b125-82c7e9b07abb/download/covid19demographicratecumulative.csv). Verify that these files are added to your storage bucket.
-- Once you're satisfied with functions of this NiFi flow, download the flow definition by right clicking anywhere in the pane and selecting "Download flow definition".
+- Once you're satisfied with functions of this NiFi flow, download the flow definition.
 - For reference, here's a picture of the flow in NiFi user interface -
   ![NiFi Flow](https://user-images.githubusercontent.com/2523891/160719482-1245dff8-7593-4b5b-890e-a74f25ba2332.png)
 
-**Step #2 - Setup Cloudera DataFlow (CDF)**
-- Now that we have the NiFi flow ready, it's time to deploy it in your CDP environment. Go to CDF user interface, select Environments & ensure CDF service is enabled in your CDP environment.
-- Select Catalog, and import the flow definition.
-  ![CDF - Import Flow](https://user-images.githubusercontent.com/2523891/160722873-9cd85f05-f5a5-4fff-8f66-2aa879e15eb5.png)
+### Step #2 - Setup Cloudera DataFlow (CDF)
+- Now that NiFi flow is ready, it's time to deploy it in your CDP environment. Go to CDF user interface, and ensure CDF service is enabled in your CDP environment.
+- Import flow definition.
 - Select imported flow, click on Deploy and follow the wizard to complete the deployment. Please note that Extra Small NiFi node size is enough for this data ingestion.
-  ![CDF - Flow Deploy](https://user-images.githubusercontent.com/2523891/160723115-46107191-991c-45ba-bf7d-9ca091078528.png)
-- After deployment is done, you would see the flow in Dashboard. You will be able to manage deployment of your flow in the Dashboard and perform functions like start/stop flow, view flow, change runtime, view KPIs, view Alerts, etc.
+- After deployment is done, you would see the flow in Dashboard. You will be able to manage deployment of your flow in the Dashboard and perform functions like start/terminate flow, view flow, change runtime, view KPIs, view Alerts, etc.
+- In Step #1, you've already executed the NiFi flow to add the source files to your storage bucket. So, you don't need to execute it again from CDF. But even if you do, it's going to just overwrite the files and not hurt anything.
+
+### Step #3 - Setup Cloudera Data Engineering (CDE)
+- Go to CDE user interface, and ensure CDE service is enabled in your CDP environment & a virtual cluster is available for use.
+- Create a Spark job. In the wizard, upload enrich.py program and leave other options as default. TODO - add file.
+- Execute the job and monitor the logs to ensure it's finished successfully. It takes approx. 4 minutes to finish.
+- Following Hive tables are created by this job:
+  - cdph.data_dictionary
+  - cdph.covid_rate_by_soc_det
+  - cdph.covid_demo_rate_cumulative
+  - member.member_profile
+  - member.target_mbrs_by_income
+  - member.target_mbrs_by_age_group
+
+### Step #4 - Setup Cloudera Data Warehouse (CDW)
+- Go to CDW user interface. Ensure CDW service is activated in your CDP environment, and a Database Catalog & a Virtual Warehouse compute cluster is available for use.
+- Open the Hue editor and explore the Hive tables created by the CDE job.
+  ```sql
+  -- Raw Data
+  select * from cdph.data_dictionary a;
+  select * from cdph.covid_rate_by_soc_det a;
+  select * from cdph.covid_demo_rate_cumulative a;
+  select * from member.member_profile a;
+  ```
+
+### Step #5 - Setup Cloudera Data Visualization (Data VIZ) Dashboard
+- Go to Data VIZ user interface.
+- Under the DATA tab, create the following Datasets:
+  - **COVID Rate by Social Determinants**  
+    Dataset Details:
+    
+    <img width="400" alt="Dataset - COVID Rate by Social Determinants" src="https://user-images.githubusercontent.com/2523891/160923268-a4521a2c-38c1-41d9-ae0f-7f1c8ac8ba09.png">
+
+    Update Dimensions & Measures to look like below:
+    
+    <img width="1089" alt="Dataset - COVID Rate by Social Determinants - Fields" src="https://user-images.githubusercontent.com/2523891/160922294-31d3e399-62fe-47a7-a6ff-582e5fe0288d.png">
+    
+  - **COVID Demographic Rate Cumulative**  
+    Dataset Details:
+    
+    <img width="400" alt="Dataset - COVID Demographic Rate Cumulative" src="https://user-images.githubusercontent.com/2523891/160923119-6b99c029-69a2-4186-95cd-54fbf238eea0.png">
+
+    Update Dimensions & Measures to look like below:
+    
+    <img width="1096" alt="Dataset - COVID Demographic Rate Cumulative - Fields" src="https://user-images.githubusercontent.com/2523891/160921967-d2bb0612-47ca-4858-84c7-931e1b0bc26d.png">
+   
+- Once the Datasets are available, go to the VISUALS tab and create a new dashboard.
+- Let's create first visual in the dashboard, to show **COVID-19 cases by income-groups**. Select Default Hive VW and COVID Rate by Social Determinants from the drop down menus, and create a new visual. Set the following parameters - 
+  - Visual Type - Combo (Combined Bar/Line)
+  - Dimension - priority_sort
+  - Bar Measure - avg(case_rate_per_100k)
+  - Tooltips - max(social_tier)
+  - Filters - social_det in ('income')  
+  
+  <img width="1434" alt="Visual 1" src="https://user-images.githubusercontent.com/2523891/160934018-1687220e-4dd7-4662-9d64-cb007dc88b8f.png">
+
+- Let's create second visual in the dashboard, to show **COVID-19 related deaths by age-groups**. Select Default Hive VW and COVID Demographic Rate Cumulative from the drop down menus, and create a new visual. Set the following parameters - 
+  - Visual Type - Lines
+  - X Axis - demographic_set_category. Go to Field Properties, and select "Ascending" under "Order and Top K".
+  - Y Axis - avg(metric_value_per_100k)
+  - Filters - 
+    - demographic_set in ('age_gp4')
+    - metric in ('deaths')
+    - county in ('Alameda', 'Contra Costa', 'Los Angeles', 'San Diego'). To see data for all the counties in California, USA, remove this filter.   
+  
+  <img width="1435" alt="Visual 2" src="https://user-images.githubusercontent.com/2523891/160934593-bce0f433-c854-42c5-ac5e-a370fd00036d.png">
+
+- For reference, here's the complete dashboard:
+
+  <img width="1412" alt="Dashboard" src="https://user-images.githubusercontent.com/2523891/160933858-6a6db82d-883d-4631-90a6-50cfb09e81c6.png">
+
+### Step #6 - Identify Impacted Members in Hue Editor
+```sql
+select * from member.target_mbrs_by_income a where social_tier = 'below $40K';
+select * from member.target_mbrs_by_age_group a where demographic_set_category = '65+';
+```
+
+### Step #7 - View Cloudera Data Catalog
 
 More to come...
