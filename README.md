@@ -1,4 +1,4 @@
-# WORK IN PROGRESS - A Data Pipeline in Cloudera Data Platform (CDP)
+# A Data Pipeline in Cloudera Data Platform (CDP)
 ## Use Case - Accelerate COVID-19 outreach programs using Data Services in CDP
 As a healthcare provider / public health official, I want to respond equitably to the COVID-19 pandemic as quickly as possible, and serve all the communities that are adversely impacted in the state of California.  
 I want to use health equity data reported by California Department of Public Health (CDPH) to **identify impacted members** and accelerate the launch of outreach programs.
@@ -13,8 +13,8 @@ I want to use health equity data reported by California Department of Public Hea
 **Prerequisites:**  
 - A modern browser such as Google Chrome and Firefox.
 - An existing CDP environment and knowledge of its basic functions.  
-- Add member_profile.csv to your storage bucket. TODO - add this file.
-- Add data dictionary - TODO - add this file in CSV format
+- Add data/member_profile.csv to your storage bucket.
+- Add data/covid-19-equity-metrics-data-dictionary.csv to your storage bucket.
 
 Steps to create this data pipeline, are as follows:  
 > Please note that this data pipeline's documentation is in accordance with CDP Runtime Version 7.2.12.
@@ -22,7 +22,7 @@ Steps to create this data pipeline, are as follows:
 ### Step #1 - Setup NiFi Flow
 - Create or use a Data Hub Cluster with NiFi.  
 Following Data Hub Cluster type was used in this exercise - "7.2.12 - Flow Management Light Duty with Apache NiFi, Apache NiFi Registry".
-- Go to NiFi user interface and import NiFi-CDPH.json flow. TODO - add JSON file.
+- Go to NiFi user interface and import NiFi-CDPH.json flow.
 - NiFi-CDPH.json uses PutS3Object processor to connect to an existing Amazon S3 bucket. **Please change the properties in this processor to use your own bucket.**
 - If you don't use Amazon S3 storage, please replace PutS3Object processor with a processor of your own choice. Refer [NiFi docs](https://nifi.apache.org/docs.html) for details.  
 For quick reference, here are the frequently used processors to write to a file system - 
@@ -43,7 +43,7 @@ For quick reference, here are the frequently used processors to write to a file 
 
 ### Step #3 - Setup Cloudera Data Engineering (CDE)
 - Go to CDE user interface, and ensure CDE service is enabled in your CDP environment & a virtual cluster is available for use.
-- Create a Spark job. In the wizard, upload enrich.py program and leave other options as default. TODO - add file.
+- Create a Spark job. In the wizard, upload enrich.py program and leave other options as default.
 - Execute the job and monitor logs to ensure it's finished successfully. It takes approx. 4 minutes to finish.
 - Following Hive tables are created by this job:
   - cdph.data_dictionary
