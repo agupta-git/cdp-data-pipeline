@@ -7,7 +7,7 @@ I want to use health equity data reported by California Department of Public Hea
 **Enrich** - Transform the dataset using Spark.  
 **Report** - Gather insights from the dataset using Hive tables and Data Visualization.  
 
-![CDP_Data_Services_Covid_Demo drawio](https://user-images.githubusercontent.com/2523891/160536124-6aab8eeb-0db2-4a61-b8ec-c287cfed881d.png)
+![Design - CDP Data Pipeline](https://user-images.githubusercontent.com/2523891/160943262-69be475d-3a06-47a3-ad34-0076b29fe706.png)
 
 ## Implementation
 **Prerequisites:**  
