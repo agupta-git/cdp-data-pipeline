@@ -43,7 +43,7 @@ For quick reference, here are the frequently used processors to write to a file 
 
 ### Step #3 - Setup Cloudera Data Engineering (CDE)
 - Go to CDE user interface, and ensure CDE service is enabled in your CDP environment & a virtual cluster is available for use.
-- Create a Spark job. In the wizard, upload enrich.py program and leave other options as default.
+- Create a Spark job. In the wizard, upload enrich.py program and leave other options as default. **Please change the _fs_ variable in enrich.py program to point to your bucket**.
 - Execute the job and monitor logs to ensure it's finished successfully. It takes approx. 4 minutes to finish.
 - Following Hive tables are created by this job:
   - cdph.data_dictionary
@@ -102,7 +102,7 @@ For quick reference, here are the frequently used processors to write to a file 
   - Filters - 
     - demographic_set in ('age_gp4')
     - metric in ('deaths')
-    - county in ('Alameda', 'Contra Costa', 'Los Angeles', 'San Diego'). To see data for all counties in California, USA, remove this filter.   
+    - county in ('Alameda', 'Contra Costa', 'Los Angeles', 'San Diego', 'San Francisco', 'Ventura'). To see data for all counties in California, USA, remove this filter.   
   <br>
   <img width="1435" alt="Visual 2" src="https://user-images.githubusercontent.com/2523891/160934593-bce0f433-c854-42c5-ac5e-a370fd00036d.png">
 
