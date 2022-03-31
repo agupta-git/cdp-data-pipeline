@@ -1,4 +1,4 @@
-# WORK IN PROGRESS - A Data Pipeline in Cloudera Data Platform (CDP)
+# A Data Pipeline in Cloudera Data Platform (CDP)
 ## Use Case - Accelerate COVID-19 outreach programs using Data Services in CDP
 As a healthcare provider / public health official, I want to respond equitably to the COVID-19 pandemic as quickly as possible, and serve all the communities that are adversely impacted in the state of California.  
 I want to use health equity data reported by California Department of Public Health (CDPH) to **identify impacted members** and accelerate the launch of outreach programs.
@@ -7,22 +7,21 @@ I want to use health equity data reported by California Department of Public Hea
 **Enrich** - Transform the dataset using Spark.  
 **Report** - Gather insights from the dataset using Hive tables and Data Visualization.  
 
-![CDP_Data_Services_Covid_Demo drawio](https://user-images.githubusercontent.com/2523891/160536124-6aab8eeb-0db2-4a61-b8ec-c287cfed881d.png)
+![Design - CDP Data Pipeline](https://user-images.githubusercontent.com/2523891/160943262-69be475d-3a06-47a3-ad34-0076b29fe706.png)
 
 ## Implementation
 **Prerequisites:**  
 - A modern browser such as Google Chrome and Firefox.
 - An existing CDP environment and knowledge of its basic functions.  
-- Add member_profile.csv to your storage bucket. TODO - add this file.
-- Add data dictionary - TODO - add this file in CSV format
+- Add data/member_profile.csv to your storage bucket.
+- Add data/covid-19-equity-metrics-data-dictionary.csv to your storage bucket. 
 
-Steps to create this data pipeline, are as follows:  
-> Please note that this data pipeline's documentation is in accordance with CDP Runtime Version 7.2.12.
-
+**Steps to create this data pipeline, are as follows:**  
+> Please note that this data pipeline's documentation is in accordance with CDP Runtime Version 7.2.12. 
 ### Step #1 - Setup NiFi Flow
 - Create or use a Data Hub Cluster with NiFi.  
-Following Data Hub Cluster type was used in this exercise - "7.2.12 - Flow Management Light Duty with Apache NiFi, Apache NiFi Registry".
-- Go to NiFi user interface and import NiFi-CDPH.json flow. TODO - add JSON file.
+Following Data Hub Cluster type can be used for this exercise - "7.2.12 - Flow Management Light Duty with Apache NiFi, Apache NiFi Registry".
+- Go to NiFi user interface and import NiFi-CDPH.json flow.
 - NiFi-CDPH.json uses PutS3Object processor to connect to an existing Amazon S3 bucket. **Please change the properties in this processor to use your own bucket.**
 - If you don't use Amazon S3 storage, please replace PutS3Object processor with a processor of your own choice. Refer [NiFi docs](https://nifi.apache.org/docs.html) for details.  
 For quick reference, here are the frequently used processors to write to a file system - 
@@ -32,6 +31,7 @@ For quick reference, here are the frequently used processors to write to a file 
 - Execute the flow and ensure InvokeHTTP processors are able to get [covid19case_rate_by_social_det.csv](https://data.chhs.ca.gov/dataset/f88f9d7f-635d-4334-9dac-4ce773afe4e5/resource/11fa525e-1c7b-4cf5-99e1-d4141ea590e4/download/covid19case_rate_by_social_det.csv) and [covid19demographicratecumulative.csv](https://data.chhs.ca.gov/dataset/f88f9d7f-635d-4334-9dac-4ce773afe4e5/resource/b500dae2-9e58-428e-b125-82c7e9b07abb/download/covid19demographicratecumulative.csv). Verify that these files are added to your storage bucket.
 - Once you're satisfied with functions of this NiFi flow, download the flow definition.
 - For reference, here's a picture of the flow in NiFi user interface -
+
   ![NiFi Flow](https://user-images.githubusercontent.com/2523891/160719482-1245dff8-7593-4b5b-890e-a74f25ba2332.png)
 
 ### Step #2 - Setup Cloudera DataFlow (CDF)
@@ -43,7 +43,7 @@ For quick reference, here are the frequently used processors to write to a file 
 
 ### Step #3 - Setup Cloudera Data Engineering (CDE)
 - Go to CDE user interface, and ensure CDE service is enabled in your CDP environment & a virtual cluster is available for use.
-- Create a Spark job. In the wizard, upload enrich.py program and leave other options as default. TODO - add file.
+- Create a Spark job. In the wizard, upload enrich.py program and leave other options as default. **Please change the _fs_ variable in enrich.py program to point to your bucket**.
 - Execute the job and monitor logs to ensure it's finished successfully. It takes approx. 4 minutes to finish.
 - Following Hive tables are created by this job:
   - cdph.data_dictionary
@@ -54,7 +54,7 @@ For quick reference, here are the frequently used processors to write to a file 
   - member.target_mbrs_by_age_group
 
 ### Step #4 - Setup Cloudera Data Warehouse (CDW)
-- Go to CDW user interface. Ensure CDW service is activated in your CDP environment, and a Database Catalog & a Virtual Warehouse compute cluster is available for use.
+- Go to CDW user interface. Ensure CDW service is activated in your CDP environment, and a Database Catalog & a Virtual Warehouse compute cluster are available for use.
 - Open Hue editor and explore the Hive tables created by CDE job.
   ```sql
   -- Raw Data
@@ -92,7 +92,7 @@ For quick reference, here are the frequently used processors to write to a file 
   - Bar Measure - avg(case_rate_per_100k)
   - Tooltips - max(social_tier)
   - Filters - social_det in ('income')  
-  
+  <br>
   <img width="1434" alt="Visual 1" src="https://user-images.githubusercontent.com/2523891/160934018-1687220e-4dd7-4662-9d64-cb007dc88b8f.png">
 
 - Let's create second visual in the dashboard, to show **COVID-19 related deaths by age-groups**. Select Default Hive VW and COVID Demographic Rate Cumulative from drop down menus, and create a new visual. Set the following parameters - 
@@ -102,8 +102,8 @@ For quick reference, here are the frequently used processors to write to a file 
   - Filters - 
     - demographic_set in ('age_gp4')
     - metric in ('deaths')
-    - county in ('Alameda', 'Contra Costa', 'Los Angeles', 'San Diego'). To see data for all the counties in California, USA, remove this filter.   
-  
+    - county in ('Alameda', 'Contra Costa', 'Los Angeles', 'San Diego', 'San Francisco', 'Ventura'). To see data for all counties in California, USA, remove this filter.   
+  <br>
   <img width="1435" alt="Visual 2" src="https://user-images.githubusercontent.com/2523891/160934593-bce0f433-c854-42c5-ac5e-a370fd00036d.png">
 
 - For reference, here's the complete dashboard:
@@ -113,10 +113,10 @@ For quick reference, here are the frequently used processors to write to a file 
 ### Step #6 - Identify impacted members in Hue editor
 - As you can see in the visuals, **below $40K** is the most impacted income group in terms of COVID-19 cases, and **65+** is the most impacted age group in terms of COVID-19 related deaths. You can now use this information, to filter members that are in these categories.
 - Open Hue editor and execute the following queries to get impacted members:
-```sql
-select * from member.target_mbrs_by_income a where social_tier = 'below $40K';
-select * from member.target_mbrs_by_age_group a where demographic_set_category = '65+';
-```
+  ```sql
+  select * from member.target_mbrs_by_income a where social_tier = 'below $40K';
+  select * from member.target_mbrs_by_age_group a where demographic_set_category = '65+';
+  ```
 
 ### Step #7 - View Hive tables in Cloudera Data Catalog
 - Go to Data Catalog user interface. Select any Hive table created in this exercise and see its lineage, schema, audits, etc.
