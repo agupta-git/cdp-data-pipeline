@@ -130,9 +130,9 @@ For quick reference, here are the frequently used processors to write to a file 
 - Once you have the project setup, start a New Session. Select JupyterLab in Editor dropdown and check Enable Spark.
 
   ![CML - Start Session](https://user-images.githubusercontent.com/2523891/162040113-7c086c16-090b-4543-bc8e-281bfcc4909e.png)
-- In your session, select covid_outreach.ipynb notebook.
+- In your session, select covid_outreach.ipynb notebook. **Please replace _YOUR_USERNAME_ and _YOUR_PASSWORD_ in the notebook with your workload's credentials.** If you're not sure how to setup this up, refer [Setting the workload password](https://docs.cloudera.com/management-console/cloud/user-management/topics/mc-setting-the-ipa-password.html).
 
-  ![CML - Notebook](https://user-images.githubusercontent.com/2523891/162041307-0cc29a2b-1ed0-43b4-8028-4fe220b6d39e.png)
+  ![CML - Notebook](https://user-images.githubusercontent.com/2523891/165230430-642abc75-dcb3-4fe1-add0-17e19f2c38ff.png)
 - Execute the notebook and see data in Hive tables.
 - Now, you're ready to play around with the datasets and build your ML models.
 - Run Experiment under Experiments menu item when you have a draft model ready.
