@@ -13,7 +13,7 @@ I want to use health equity data reported by California Department of Public Hea
 ## Implementation
 **Prerequisites:**  
 - A modern browser such as Google Chrome and Firefox.
-- An existing CDP environment and knowledge of its basic functions.  
+- An existing CDP Public Cloud environment and knowledge of its basic functions.  
 - Add data/member_profile.csv to your storage bucket.
 - Add data/covid-19-equity-metrics-data-dictionary.csv to your storage bucket. 
 
@@ -22,8 +22,8 @@ I want to use health equity data reported by California Department of Public Hea
 ### Step #1 - Setup NiFi Flow
 - Create or use a Data Hub Cluster with NiFi.  
 Following Data Hub Cluster type can be used for this exercise - "7.2.12 - Flow Management Light Duty with Apache NiFi, Apache NiFi Registry".
-- Go to NiFi user interface and import NiFi-CDPH.json flow.
-- NiFi-CDPH.json uses PutS3Object processor to connect to an existing Amazon S3 bucket. **Please change the properties in this processor to use your own bucket.**
+- Go to NiFi user interface and upload NiFi-CDPH.xml as a template.
+- NiFi-CDPH.xml uses PutS3Object processor to connect to an existing Amazon S3 bucket. **Please change the properties in this processor to use your own bucket.**
 - If you don't use Amazon S3 storage, please replace PutS3Object processor with a processor of your own choice. Refer [NiFi docs](https://nifi.apache.org/docs.html) for details.  
 For quick reference, here are the frequently used processors to write to a file system - 
   * PutAzureDataLakeStorage for Azure Data Lake Storage
