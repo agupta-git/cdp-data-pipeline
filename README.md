@@ -14,8 +14,8 @@ I want to use health equity data reported by California Department of Public Hea
 **Prerequisites:**  
 - A modern browser such as Google Chrome and Firefox.
 - An existing CDP Public Cloud environment and knowledge of its basic functions.  
-- Add data/member_profile.csv to your storage bucket.
-- Add data/covid-19-equity-metrics-data-dictionary.csv to your storage bucket. 
+- Add data/covid-19-equity-metrics-data-dictionary.csv to your storage bucket.
+- Add data/member_profile.csv to your storage bucket. 
 
 **Steps to create this data pipeline, are as follows:**  
 > Please note that this data pipeline's documentation is in accordance with CDP Runtime Version 7.2.12. 
